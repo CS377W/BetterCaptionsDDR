@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:keepScreenOn="true" xmlns:app="http://schemas.android.com/apk/res/com.example.bettercaptionddr">
+    
+    <com.example.bettercaptionddr.CompassIndicator
+        android:id="@+id/compassIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="15" >
+
+        <com.example.bettercaptionddr.VerticalProgressBar
+            android:id="@+id/progressBar1"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:progress="0"
+            android:progressDrawable="@drawable/ddrprogressbar" />
+
+        <com.example.bettercaptionddr.VerticalProgressBar
+            android:id="@+id/progressBar2"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:progressDrawable="@drawable/ddrprogressbar" />
+
+        <com.example.bettercaptionddr.VerticalProgressBar
+            android:id="@+id/progressBar3"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:progressDrawable="@drawable/ddrprogressbar" />
+    </LinearLayout>
+
+    <com.example.bettercaptionddr.FeedbackView
+        android:id="@+id/feedbackView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        state="neutral"
+        app:state="neutral" />
+
+</LinearLayout>
