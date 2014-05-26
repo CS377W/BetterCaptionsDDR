@@ -2,12 +2,15 @@ package com.example.bettercaptionddr;
 
 import java.util.Date;
 
+import com.google.android.glass.sample.compass.OrientationManager;
+
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -18,6 +21,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private UpcomingMoveIndicator left, center, right;
     private FeedbackView feedbackView;
     private CompassIndicator compassIndicator;
+    private OrientationManager mOrientationManager;
 
     private Handler handler = new Handler();
     private static final int BEAT_INTERVAL = (int) (60 / 128.0f * 1000);
@@ -120,6 +124,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     protected void onDestroy() {
 	super.onDestroy();
 	mediaPlayer.stop();
+	mOrientationManager.removeOnChangedListener(mCompassListener);
+        mOrientationManager.stop();
     }
 
     @Override
@@ -149,15 +155,16 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private Sensor magnetometer;
-
 
     private void setUpSensors() {
 	sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 	accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 	sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-        magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        sensorManager.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_NORMAL);
+
+	LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mOrientationManager = new OrientationManager(sensorManager, locationManager);
+        mOrientationManager.addOnChangedListener(mCompassListener);
+        mOrientationManager.start();
     }
 
     @Override
@@ -169,9 +176,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
 	if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 	    handleAccelerometerEvent(event);
-	}
-	if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-	    handleCompassEvent(event);
 	}
     }
 
@@ -214,49 +218,20 @@ public class MainActivity extends Activity implements SensorEventListener {
 	    }
 	}
     }
+    
+    private final OrientationManager.OnChangedListener mCompassListener = new OrientationManager.OnChangedListener() {
 
-    private boolean hasInitAngle = false;
-    private float initialAngle, lastR;
-    private Handler sensorHandler = new Handler();
-    private void handleCompassEvent(SensorEvent event) {
-	float[]  geomagnetic = event.values.clone();
-	float[] gravity = event.values.clone();
-	if (gravity == null || geomagnetic == null) return;
+        @Override
+        public void onOrientationChanged(OrientationManager orientationManager) {
+            compassIndicator.setDegree(orientationManager.getHeading());
+        }
 
-	float R[] = new float[9];
-	float I[] = new float[9];
+        @Override
+        public void onLocationChanged(OrientationManager orientationManager) {
+        }
 
-	if (SensorManager.getRotationMatrix(R, I, gravity, geomagnetic)) {
-	    float r;
-	    float orientation[] = new float[3];
-	    SensorManager.getOrientation(R, orientation);
-	    float azimut = orientation[0];
-	    r = (float) Math.round((Math.toDegrees(azimut))*2)/2;
-
-	    // Convert to 0-360
-	    if (r < 0) 
-		r += 360;
-
-	    if (!hasInitAngle) {
-		initialAngle = r;
-		hasInitAngle = true;
-	    }
-	    // Make the current angle to be 0
-	    r -= initialAngle;
-	    if (r >= 180) 
-		r -= 360;
-
-
-	    lastR = r;
-	    
-	    Log.d("CS377W", "lastR " + lastR + " " + azimut);
-	}
-	
-	sensorHandler.postDelayed(new Runnable() {
-	    @Override
-	    public void run() {
-		compassIndicator.setDegree(lastR);
-	    }
-	}, 0);
-    }
+        @Override
+        public void onAccuracyChanged(OrientationManager orientationManager) {
+        }
+    };
 }

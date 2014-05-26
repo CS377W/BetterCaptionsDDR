@@ -48,12 +48,11 @@ public class CompassIndicator extends View {
     }
     
     private float degreeToXLoc() {
-	float transDegree = mDegree + 180;
-	return (transDegree * getWidth()) / 360.0f;
+	return (mDegree * getWidth()) / 360.0f;
     }
     
     public void setDegree(float degree) {
-	if (degree < -180 || degree > 180) return;
+	if (degree < 0 || degree > 360) return;
 	mDegree = degree;
 	invalidate();
 	requestLayout();
