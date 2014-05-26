@@ -3,6 +3,7 @@ package com.example.bettercaptionddr;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
@@ -19,13 +20,7 @@ public class CompassIndicator extends View {
 
     public CompassIndicator(Context context, AttributeSet attrs) {
 	super(context, attrs);
-
-	TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
-		R.styleable.FeedbackView, 0, 0);
-
 	init();
-	
-	a.recycle();
     }
 
     public CompassIndicator(Context context, AttributeSet attrs, int defStyle) {
@@ -35,7 +30,7 @@ public class CompassIndicator extends View {
     
     private void init() {
 	mBGPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-	mBGPaint.setColor(0xff000000);
+	mBGPaint.setColor(Color.BLACK);
 	
 	mIndicatorPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	mIndicatorPaint.setColor(0xaaffffff);

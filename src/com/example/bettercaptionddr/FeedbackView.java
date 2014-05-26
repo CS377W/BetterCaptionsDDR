@@ -1,15 +1,20 @@
 package com.example.bettercaptionddr;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class FeedbackView extends View {
-    private int mState;
+    private enum State { NEUTRAL, CORRECT, INCORRECT };
+    private State mState = State.INCORRECT;
+    private int mScore = 0;
     private Paint mPaint;
+    private Paint mScorePaint;
 
     public FeedbackView(Context context) {
 	super(context);
@@ -18,34 +23,30 @@ public class FeedbackView extends View {
 
     public FeedbackView(Context context, AttributeSet attrs) {
 	super(context, attrs);
-
-	TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
-		R.styleable.FeedbackView, 0, 0);
-
-	try {
-	    mState = a.getInteger(R.styleable.FeedbackView_state, 0);
-	    init();
-	} finally {
-	    a.recycle();
-	}
+	init();
     }
 
     public FeedbackView(Context context, AttributeSet attrs, int defStyle) {
 	super(context, attrs, defStyle);
 	init();
     }
-    
+
     private void init() {
 	mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+	mScorePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+	mScorePaint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
     }
-    
+
     private void setUpColors() {
-	if (mState == 1) // incorrect
-	    mPaint.setColor(0xffee2222);
-	else if (mState == 2) // correct
-	    mPaint.setColor(0xff22cc22);
-	else
+	if (mState == State.INCORRECT) {
+	    mPaint.setColor(0xaaee2222);
+	} else if (mState == State.CORRECT) {
+	    mPaint.setColor(0xaa22cc22);
+	} else {
 	    mPaint.setColor(0x44ffffff);
+	}
+	
+	mScorePaint.setColor(Color.WHITE);
     }
 
     @Override
@@ -53,24 +54,42 @@ public class FeedbackView extends View {
 	super.onDraw(canvas);
 	setUpColors();
 	canvas.drawRect(0, 0, getWidth(), getHeight(), mPaint);
+	if (getHeight() != mScorePaint.getTextSize()) {
+	    Log.d("CS377W", " mScorePaint.setTextSize");
+	    mScorePaint.setTextSize(getHeight());
+	}
+	canvas.drawText(mScore + "", 0,  getHeight(), mScorePaint);
     }
 
     public void setStateCorrect() {
-	mState = 2;
+	mState = State.CORRECT;
+	mScore++;
 	invalidate();
 	requestLayout();
+    }
+
+    public boolean isStateCorrect() {
+	return mState == State.CORRECT;
     }
 
     public void setStateIncorrect() {
-	mState = 1;
+	mState = State.INCORRECT;
+	mScore--;
 	invalidate();
 	requestLayout();
+    }
+
+    public boolean isStateIncorrect() {
+	return mState == State.INCORRECT;
     }
 
     public void setStateNeutral() {
-	mState = 0;
+	mState = State.NEUTRAL;
 	invalidate();
 	requestLayout();
     }
 
+    public boolean isStateNeutral() {
+	return mState == State.NEUTRAL;
+    }
 }

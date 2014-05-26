@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
+    android:keepScreenOn="true"
     android:orientation="vertical"
-    android:keepScreenOn="true" xmlns:app="http://schemas.android.com/apk/res/com.example.bettercaptionddr">
-    
+    tools:ignore="NestedWeights" >
+
     <com.example.bettercaptionddr.CompassIndicator
         android:id="@+id/compassIndicator"
         android:layout_width="match_parent"
@@ -16,38 +19,29 @@
         android:layout_height="0dp"
         android:layout_weight="15" >
 
-        <com.example.bettercaptionddr.VerticalProgressBar
+        <com.example.bettercaptionddr.UpcomingMoveIndicator
             android:id="@+id/progressBar1"
-            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:progress="0"
-            android:progressDrawable="@drawable/ddrprogressbar" />
+            android:layout_weight="1" />
 
-        <com.example.bettercaptionddr.VerticalProgressBar
+        <com.example.bettercaptionddr.UpcomingMoveIndicator
             android:id="@+id/progressBar2"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_height="match_parent"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:progressDrawable="@drawable/ddrprogressbar" />
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
-        <com.example.bettercaptionddr.VerticalProgressBar
+        <com.example.bettercaptionddr.UpcomingMoveIndicator
             android:id="@+id/progressBar3"
-            style="?android:attr/progressBarStyleHorizontal"
-            android:layout_height="match_parent"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:progressDrawable="@drawable/ddrprogressbar" />
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
     </LinearLayout>
 
     <com.example.bettercaptionddr.FeedbackView
         android:id="@+id/feedbackView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        state="neutral"
-        app:state="neutral" />
+        android:layout_weight="1.5" />
 
 </LinearLayout>
