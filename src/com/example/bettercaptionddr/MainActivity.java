@@ -69,7 +69,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 		    feedbackView.setStateNeutral();
 		}
 
-		Log.d("CS377W", Math.abs(timeOfAccelerometerMove - timeOfBarHit) + "");
+		//Log.d("CS377W", Math.abs(timeOfAccelerometerMove - timeOfBarHit) + "");
 		if (timeOfAccelerometerMove != -1 && Math.abs(timeOfAccelerometerMove - timeOfBarHit) < MOVE_TOLERANCE) {
 		    // We got a hit!
 		    feedbackView.setStateCorrect();
@@ -223,7 +223,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         @Override
         public void onOrientationChanged(OrientationManager orientationManager) {
-            compassIndicator.setDegree(orientationManager.getHeading());
+            compassIndicator.setDegree(orientationManager.getDDRHeading());
         }
 
         @Override

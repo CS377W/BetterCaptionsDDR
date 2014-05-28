@@ -1,17 +1,18 @@
 package com.example.bettercaptionddr;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class CompassIndicator extends View {
     private float mDegree = 0;
     private Paint mBGPaint, mIndicatorPaint;
     private static final float INDICATOR_WIDTH = 20.0f;
+    private static final float MAX_DEGREES = 120.0f;
 
     public CompassIndicator(Context context) {
 	super(context);
@@ -48,11 +49,16 @@ public class CompassIndicator extends View {
     }
     
     private float degreeToXLoc() {
-	return (mDegree * getWidth()) / 360.0f;
+	return (mDegree * getWidth()) / MAX_DEGREES;
     }
     
     public void setDegree(float degree) {
+       Log.d("CS377W", degree + "");
 	if (degree < 0 || degree > 360) return;
+	float upperBound = 180 + MAX_DEGREES / 2;
+	float lowerBound = 180 - MAX_DEGREES / 2;
+	if (mDegree > upperBound) mDegree = upperBound;
+	if (mDegree < lowerBound) mDegree = lowerBound;
 	mDegree = degree;
 	invalidate();
 	requestLayout();
