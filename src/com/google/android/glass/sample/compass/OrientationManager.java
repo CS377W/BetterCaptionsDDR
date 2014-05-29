@@ -17,11 +17,9 @@ package com.google.android.glass.sample.compass;
 
 
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import com.google.android.glass.sample.compass.util.MathUtils;
 
+import android.content.Context;
 import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -33,9 +31,11 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 
-import com.google.android.glass.sample.compass.util.MathUtils;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Collects and communicates information about the user's current orientation and location.
@@ -105,15 +105,7 @@ public class OrientationManager {
     private Location mLocation;
     private GeomagneticField mGeomagneticField;
     private boolean mHasInterference;
-    private float mInitialHeading = 0.0f;
-    
 
-    public void setInitialHeading() {
-       mInitialHeading = mHeading;
-    }
-    
-    
-    
     /**
      * The sensor listener used by the orientation manager.
      */
@@ -147,8 +139,7 @@ public class OrientationManager {
                 float magneticHeading = (float) Math.toDegrees(mOrientation[0]);
                 mHeading = MathUtils.mod(computeTrueNorth(magneticHeading), 360.0f)
                         - ARM_DISPLACEMENT_DEGREES;
-                if (mInitialHeading == 0.0) setInitialHeading();
-                
+
                 notifyOrientationChanged();
             }
         }
@@ -290,17 +281,6 @@ public class OrientationManager {
      */
     public float getHeading() {
         return mHeading;
-    }
-    
-    public float getDDRHeading() {
-
-       float difference = mHeading - mInitialHeading;
-       float absDiff = Math.abs(difference);
-       if (absDiff > 180) absDiff = 360 - absDiff;
-       int sign = (difference < 0) ? -1 : 1;
-       
-       return 180 - sign * absDiff;
-        
     }
 
     /**
