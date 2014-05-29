@@ -121,7 +121,8 @@ public class OrientationManager {
 
         @Override
         public void onSensorChanged(SensorEvent event) {
-            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+            if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR
+        	    || event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
                 // Get the current heading from the sensor, then notify the listeners of the
                 // change.
                 SensorManager.getRotationMatrixFromVector(mRotationMatrix, event.values);
