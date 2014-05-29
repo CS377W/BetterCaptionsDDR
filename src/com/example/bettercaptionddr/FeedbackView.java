@@ -12,6 +12,7 @@ import android.view.View;
 public class FeedbackView extends View {
     private enum State { NEUTRAL, CORRECT, INCORRECT };
     private State mState = State.INCORRECT;
+    private int pointModifier = 1;
     private int mScore = 0;
     private Paint mPaint;
     private Paint mScorePaint;
@@ -62,8 +63,10 @@ public class FeedbackView extends View {
     }
 
     public void setStateCorrect() {
+	if(pointModifier <= 1) pointModifier = 1;
 	mState = State.CORRECT;
-	mScore++;
+	mScore += pointModifier;
+	pointModifier++; //COMBOOOOOOOO
 	invalidate();
 	requestLayout();
     }
@@ -73,8 +76,10 @@ public class FeedbackView extends View {
     }
 
     public void setStateIncorrect() {
+	if(pointModifier >= 1) pointModifier = -1;
 	mState = State.INCORRECT;
-	mScore--;
+	mScore += pointModifier;
+	pointModifier--; //NEGATIVE COMBOOOOO
 	invalidate();
 	requestLayout();
     }

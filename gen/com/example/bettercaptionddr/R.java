@@ -14,20 +14,21 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int compassIndicator=0x7f070000;
-        public static final int feedbackView=0x7f070004;
-        public static final int progressBar1=0x7f070001;
-        public static final int progressBar2=0x7f070002;
-        public static final int progressBar3=0x7f070003;
+        public static final int compassIndicator=0x7f080000;
+        public static final int feedbackView=0x7f080004;
+        public static final int progressBar1=0x7f080001;
+        public static final int progressBar2=0x7f080002;
+        public static final int progressBar3=0x7f080003;
     }
     public static final class layout {
         public static final int ddr_layout=0x7f030000;
     }
     public static final class raw {
-        public static final int bad=0x7f040000;
+        public static final int bad=0x7f050000;
     }
     public static final class string {
-        public static final int app_name=0x7f050000;
+        public static final int app_name=0x7f060000;
+        public static final int glass_ddr_trigger=0x7f060001;
     }
     public static final class style {
         /** 
@@ -51,10 +52,13 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f060000;
+        public static final int AppBaseTheme=0x7f070000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f060001;
+        public static final int AppTheme=0x7f070001;
+    }
+    public static final class xml {
+        public static final int voice_trigger_ddr=0x7f040000;
     }
 }

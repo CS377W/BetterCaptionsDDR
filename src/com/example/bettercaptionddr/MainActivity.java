@@ -11,20 +11,19 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-public class MainActivity extends Activity implements SensorEventListener {
+public class MainActivity extends BaseActivity implements SensorEventListener {
     private UpcomingMoveIndicator left, center, right;
     private FeedbackView feedbackView;
     private CompassIndicator compassIndicator;
     private OrientationManager mOrientationManager;
 
     private Handler handler = new Handler();
-    private static final int BEAT_INTERVAL = (int) (60 / 128.0f * 1000);
+    private static int BEAT_INTERVAL;
 
     private long timeOfBarHit = -1;
 
@@ -42,9 +41,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 		timeOfBarHit = (new Date()).getTime();
 
 		if (mBar.getRequiresMove()) {
-		    handleOnDirAndMove();
+		    handleOnDirAndMove(mBar);
 		} else {
-		    handleOnDir();
+		    handleOnDir(mBar);
 		}
 
 		mBar.reset();
@@ -54,11 +53,22 @@ public class MainActivity extends Activity implements SensorEventListener {
 	    upcomingMoveHandler.postDelayed(this, BEAT_INTERVAL/(100/INCREMENT_BY));
 	}
     }
+    
+    @Override
+    protected void handleOnScroll(int direction) {
+	if (direction < 0) {
+	    BEAT_INTERVAL /= 1.5;
+	    MOVE_TOLERANCE = BEAT_INTERVAL/3;
+	} else {
+	    BEAT_INTERVAL *= 1.5;
+	    MOVE_TOLERANCE = BEAT_INTERVAL/3;
+	}
+    }
 
     private Handler moveHandler = new Handler();
-    private static final int MOVE_TOLERANCE = BEAT_INTERVAL/2;
+    private static int MOVE_TOLERANCE;
 
-    private void handleOnDirAndMove() {
+    private void handleOnDirAndMove(final UpcomingMoveIndicator mBar) {
 	if (timeOfBarHit == -1) return;
 
 	moveHandler.postDelayed(new Runnable() {
@@ -68,9 +78,16 @@ public class MainActivity extends Activity implements SensorEventListener {
 		if (!feedbackView.isStateNeutral()) {
 		    feedbackView.setStateNeutral();
 		}
-
-		Log.d("CS377W", Math.abs(timeOfAccelerometerMove - timeOfBarHit) + "");
-		if (timeOfAccelerometerMove != -1 && Math.abs(timeOfAccelerometerMove - timeOfBarHit) < MOVE_TOLERANCE) {
+		
+		int dirBucket = compassIndicator.getBucket();
+		boolean isBucketMatch = (dirBucket == 1 && mBar == left)
+			|| (dirBucket == 2 && mBar == center)
+			|| (dirBucket == 3 && mBar == right);
+		
+		Log.d("CS377W", "isBucketMatch:" + isBucketMatch + " " + Math.abs(timeOfAccelerometerMove - timeOfBarHit) + "");
+		if (isBucketMatch
+			&& timeOfAccelerometerMove != -1
+			&& Math.abs(timeOfAccelerometerMove - timeOfBarHit) < MOVE_TOLERANCE) {
 		    // We got a hit!
 		    feedbackView.setStateCorrect();
 		} else {
@@ -81,15 +98,43 @@ public class MainActivity extends Activity implements SensorEventListener {
 	}, 0);
     }
 
-    private void handleOnDir() {
+    private void handleOnDir(final UpcomingMoveIndicator mBar) {
+	if (timeOfBarHit == -1) return;
 
+	moveHandler.postDelayed(new Runnable() {
+	    @Override
+	    public void run() {
+		// Clear previous
+		if (!feedbackView.isStateNeutral()) {
+		    feedbackView.setStateNeutral();
+		}
+		
+		int dirBucket = compassIndicator.getBucket();
+		boolean isBucketMatch = (dirBucket == 1 && mBar == left)
+			|| (dirBucket == 2 && mBar == center)
+			|| (dirBucket == 3 && mBar == right);
+		
+		Log.d("CS377W", "isBucketMatch:" + isBucketMatch);
+		if (isBucketMatch) {
+		    // We got a hit!
+		    feedbackView.setStateCorrect();
+		} else {
+		    // We missed it.
+		    feedbackView.setStateIncorrect();
+		}
+	    }
+	}, 0);
     }
+    
+    private boolean beatIsRunning = true;
 
     private Runnable beatRunnable = new Runnable() {
 	public void run() {
+	    if (!beatIsRunning) return;
+	    
 	    int which = (int) (Math.random() * 4);
 	    UpcomingMoveIndicator currentBar = which == 1 ? left : which == 2 ? center : which == 3 ? right : null;
-	    boolean requiresMove = true; //Math.random() >= 0.5;
+	    boolean requiresMove = Math.random() >= 0.5;
 	    if (currentBar != null) {
 		currentBar.setRequiresMove(requiresMove);
 		UpcomingMoveRunnable upcomingMoveRunnable = new UpcomingMoveRunnable();
@@ -117,6 +162,11 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 	setUpSensors();
 	startMediaPlayer();
+	
+	BEAT_INTERVAL = (int) (60 / 128.0f * 1000) * 3;
+	MOVE_TOLERANCE = BEAT_INTERVAL/3;
+	
+	beatIsRunning = true;
 	beatRunnable.run();
     }
 
@@ -126,19 +176,23 @@ public class MainActivity extends Activity implements SensorEventListener {
 	mediaPlayer.stop();
 	mOrientationManager.removeOnChangedListener(mCompassListener);
         mOrientationManager.stop();
+        beatIsRunning = false;
     }
 
     @Override
     protected void onPause() {
 	super.onPause();
 	mediaPlayer.stop();
+	beatIsRunning = false;
     }
 
-    @Override
-    protected void onResume() {
-	super.onResume();
-	startMediaPlayer();
-    }
+    // @Override
+    // protected void onResume() {
+    // super.onResume();
+    // startMediaPlayer();
+    // beatIsRunning = true;
+    // beatRunnable.run();
+    // }
 
     private void startMediaPlayer() {
 	if (mediaPlayer != null) {
